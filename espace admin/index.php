@@ -16,5 +16,6 @@ if(!$_SESSION['mdp']){
 <body>
     <a href="./utilisateur.php">Afficher tous les utilisateurs</a>
     <h1>Page principale de notre site web</h1>
+    <h2>Titre 2</h2>
 </body>
 </html>

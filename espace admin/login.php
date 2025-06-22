@@ -1,7 +1,7 @@
 <?php
 // login.php - Page de connexion
 
-// Inclure la connexion à la base (optionnel pour le moment)
+
 // include 'includes/db.php';
 
 $message = '';

@@ -1,19 +1,32 @@
 <?php
-// register.php - Page d'inscription
+session_start();
+include 'includes/db.php';
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = htmlspecialchars($_POST['username']);
     $email = htmlspecialchars($_POST['email']);
-    $password = htmlspecialchars($_POST['password']);
-    $confirm_password = htmlspecialchars($_POST['confirm_password']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
 
-    if ($password !== $confirm_password) {
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+        $message = "Tous les champs sont obligatoires.";
+    } elseif ($password !== $confirm_password) {
         $message = "Les mots de passe ne correspondent pas.";
     } else {
-        // À relier à la base plus tard
-        $message = "Inscription réussie pour :<br>Nom : $username<br>Email : $email";
+        // Hachage du mot de passe
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            // Insertion dans la base
+            $stmt = $pdo->prepare("INSERT INTO user (username, email, password) VALUES (?, ?, ?)");
+            $stmt->execute([$username, $email, $hashed_password]);
+
+            $message = "<div class='success'>Inscription réussie ! Bienvenue, $username.</div>";
+        } catch (PDOException $e) {
+            $message = "<div class='error'>Erreur lors de l'inscription : " . $e->getMessage() . "</div>";
+        }
     }
 }
 ?>
@@ -30,9 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>S'inscrire</h1>
 
         <?php if ($message): ?>
-            <div class="message">
-                <?= $message ?>
-            </div>
+            <div class="message"><?= $message ?></div>
         <?php endif; ?>
 
         <form method="POST" action="">
@@ -50,8 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit">S'inscrire</button>
         </form>
-
-        <p>Déjà inscrit ? <a href="login.php">Se connecter ici</a></p>
+<p>Déjà inscrit ? <a href="login.php">Se connecter ici</a></p>
     </div>
 </body>
 </html>

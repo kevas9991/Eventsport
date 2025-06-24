@@ -1,18 +1,18 @@
 <?php
-// login.php - Page de connexion
+session_start();
 
+// Vérifie si l'utilisateur est déjà connecté
+if (isset($_SESSION['user'])) {
+    header('Location: index.php');
+    exit;
+}
 
-// include 'includes/db.php';
+include 'includes/db.php';
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Ce code sera activé plus tard, pour l'instant on affiche juste un message
-    $email = htmlspecialchars($_POST['email']);
-    $password = htmlspecialchars($_POST['password']);
-
-    // Ici, on simule une tentative de connexion
-    $message = "Formulaire soumis !<br>Email : $email";
+    // Code pour la connexion utilisateur
 }
 ?>
 
@@ -28,9 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>Se connecter</h1>
 
         <?php if ($message): ?>
-            <div class="message">
-                <?= $message ?>
-            </div>
+            <div class="message"><?= $message ?></div>
         <?php endif; ?>
 
         <form method="POST" action="">
@@ -43,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Se connecter</button>
         </form>
 
-        <p>Pas encore de compte ? <a href="register.php">S'inscrire ici</a></p>
+        <p><a href="register.php">Pas encore inscrit ? S'inscrire ici</a></p>
     </div>
 </body>
 </html>

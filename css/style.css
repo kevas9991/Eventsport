@@ -17,7 +17,7 @@ body {
 }
 
 /* ========================================= */
-/* ===== STYLES DES NAVIGATIONS (ADMIN & PUBLIC) ===== */
+/* ===== STYLES DES NAVIGATIONS (ADMIN & PUBLIQUE) ===== */
 /* ========================================= */
 
 /* ===== NAVBAR VERTICALE ROUGE (ADMIN) ===== */
@@ -74,9 +74,10 @@ body {
 }
 
 /* ===== NAVBAR VERTICALE BLEUE (PUBLIQUE) ===== */
+/* NOTE: Ces styles sont basés sur votre premier bloc, assurant une navbar bleue pour le public. */
 .public-navbar-vertical {
     width: 200px;
-    background-color: #f4f4f4; /* Fond clair pour la navbar publique */
+    background-color: #2980b9; /* Bleu vif pour la navbar publique */
     position: fixed; /* Reste fixe au défilement */
     height: 100%;
     padding: 20px 0;
@@ -85,7 +86,7 @@ body {
     flex-direction: column;
     align-items: center;
     z-index: 999;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid #1565a0;
 }
 
 .navbar-header-public {
@@ -94,7 +95,7 @@ body {
 }
 
 .navbar-header-public h1 {
-    color: #2c3e50; /* Bleu foncé pour le titre */
+    color: #fff; /* Titre en blanc sur fond bleu */
     font-size: 1.8rem;
     font-weight: 700;
     margin: 0;
@@ -115,7 +116,7 @@ body {
 .navbar-menu-public li a {
     display: block;
     padding: 12px 20px;
-    color: #34495e; /* Bleu gris pour les liens */
+    color: #fff; /* Liens en blanc */
     text-decoration: none;
     font-size: 1.1rem;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -125,10 +126,11 @@ body {
 
 .navbar-menu-public li a:hover,
 .navbar-menu-public li a.active {
-    background-color: #e0e0e0; /* Gris clair au survol/actif */
-    color: #e74c3c; /* Texte en rouge (Eventsport) au survol/actif */
-    border-left-color: #e74c3c; /* Bordure gauche en rouge */
+    background-color: #217dbb; /* Bleu plus foncé au survol/actif */
+    color: #ffd700; /* Jaune clair au survol/actif (optionnel, sinon blanc) */
+    border-left-color: #ffd700; /* Bordure gauche jaune (optionnel) */
 }
+
 
 /* ========================================= */
 /* ===== STYLES DE DISPOSITION DU BODY ET CONTENU PRINCIPAL ===== */

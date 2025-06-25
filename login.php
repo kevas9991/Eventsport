@@ -1,18 +1,32 @@
 <?php
 session_start();
-
-// Vérifie si l'utilisateur est déjà connecté
-if (isset($_SESSION['user'])) {
-    header('Location: index.php');
-    exit;
-}
-
 include 'includes/db.php';
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Code pour la connexion utilisateur
+    $email = htmlspecialchars($_POST['email']);
+    $password = $_POST['password'];
+
+    // Vérifier si l'utilisateur existe
+    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
+        // Connexion réussie → on stocke l'utilisateur dans la session
+        $_SESSION['user'] = $user;
+
+        // Redirection selon le rôle de l'utilisateur
+        if ($user['role'] === 'admin') {
+            header('Location: admin/index.php');
+        } else {
+            header('Location: index.php');
+        }
+        exit;
+    } else {
+        $message = "<div class='error'>Email ou mot de passe incorrect.</div>";
+    }
 }
 ?>
 

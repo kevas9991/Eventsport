@@ -1,82 +1,69 @@
 <?php
-// event.php - Détail d'un événement
+// events.php - Liste des événements à venir
 
 session_start();
 include 'includes/db.php';
 
-// Vérifier si l'ID est fourni dans l'URL
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    die("Événement introuvable.");
-}
-
-$event_id = $_GET['id'];
-
-// Charger les données de l'événement
-$stmt = $pdo->prepare("SELECT e.*, u.username AS creator_name FROM event e JOIN user u ON e.creator_id = u.id WHERE e.id = ?");
-$stmt->execute([$event_id]);
-$event = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$event) {
-    die("Événement introuvable.");
-}
+// Récupérer tous les événements à venir
+$stmt = $pdo->query("SELECT e.*, u.username AS creator_name FROM event e JOIN user u ON e.creator_id = u.id ORDER BY e.date ASC");
+$events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($event['title']) ?> - EventSport</title>
+    <title>Événements à venir - EventSport</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>EventSport</h1>
-            <nav>
-                <?php if (isset($_SESSION['user'])): ?>
-                    <a href="admin/index.php">Espace Admin</a>
-                    <a href="logout.php">Se déconnecter</a>
-                <?php else: ?>
-                    <a href="login.php">Se connecter</a>
-                    <a href="register.php">S'inscrire</a>
-                <?php endif; ?>
-            </nav>
+
+<!-- En-tête -->
+<header>
+    <div class="container">
+        <h1>EventSport</h1>
+        <nav>
+            <?php if (isset($_SESSION['user'])): ?>
+                <a href="admin/index.php">Espace Admin</a>
+                <a href="logout.php">Se déconnecter</a>
+            <?php else: ?>
+                <a href="login.php">Se connecter</a>
+                <a href="register.php">S'inscrire</a>
+            <?php endif; ?>
+        </nav>
+    </div>
+</header>
+
+<!-- Contenu principal -->
+<main class="container">
+    <h2>Événements à venir</h2>
+
+    <?php if (!empty($events)): ?>
+        <div class="event-list">
+            <?php foreach ($events as $event): ?>
+                <div class="event-card">
+                    <h3><?= htmlspecialchars($event['title']) ?></h3>
+                    <p><strong>Date :</strong> <?= htmlspecialchars($event['date']) ?></p>
+                    <p><strong>Lieu :</strong> <?= htmlspecialchars($event['location']) ?></p>
+                    <p><strong>Description :</strong> <?= nl2br(htmlspecialchars($event['description'])) ?></p>
+                    <p><strong>Créé par :</strong> <?= htmlspecialchars($event['creator_name']) ?></p>
+                    <a href="event.php?id=<?= $event['id'] ?>" class="btn">Voir les détails</a>
+                </div>
+            <?php endforeach; ?>
         </div>
-    </header>
+    <?php else: ?>
+        <p>Aucun événement prévu pour le moment.</p>
+    <?php endif; ?>
 
-    <main class="container">
-        <h2>Détails de l’événement</h2>
+    <p><a href="index.php" class="btn-back">← Retour à l'accueil</a></p>
+</main>
 
-        <div class="event-detail">
-            <h3><?= htmlspecialchars($event['title']) ?></h3>
-            <p><strong>Date :</strong> <?= $event['date'] ?></p>
-            <p><strong>Lieu :</strong> <?= htmlspecialchars($event['location']) ?></p>
-            <p><strong>Description :</strong></p>
-            <p><?= nl2br(htmlspecialchars($event['description'])) ?></p>
-            <p><strong>Créé par :</strong> <?= htmlspecialchars($event['creator_name']) ?></p>
-        </div>
+<!-- Pied de page -->
+<footer>
+    <div class="container">
+        <p>&copy; 2025 EventSport. Tous droits réservés.</p>
+    </div>
+</footer>
 
-        <!-- Formulaire optionnel pour s'inscrire -->
-        <?php if (isset($_SESSION['user'])): ?>
-            <div class="action">
-                <form method="POST" action="join-event.php">
-                    <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
-                    <button type="submit" class="btn">Je participe</button>
-                </form>
-            </div>
-        <?php else: ?>
-            <div class="info">
-                <p>Connectez-vous pour vous inscrire à cet événement.</p>
-            </div>
-        <?php endif; ?>
-
-        <p><a href="index.php" class="btn-back">← Retour aux événements</a></p>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 EventSport. Tous droits réservés.</p>
-        </div>
-    </footer>
 </body>
 </html>

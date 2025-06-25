@@ -23,7 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO user (username, email, password) VALUES (?, ?, ?)");
             $stmt->execute([$username, $email, $hashed_password]);
 
-            $message = "<div class='success'>Inscription réussie ! Bienvenue, $username.</div>";
+            // Redirection vers index.php après l'inscription réussie
+            header('Location: index.php');
+            exit;
         } catch (PDOException $e) {
             $message = "<div class='error'>Erreur lors de l'inscription : " . $e->getMessage() . "</div>";
         }
@@ -61,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit">S'inscrire</button>
         </form>
-<p>Déjà inscrit ? <a href="login.php">Se connecter ici</a></p>
+
+        <p>Déjà inscrit ? <a href="login.php">Se connecter ici</a></p>
     </div>
 </body>
 </html>

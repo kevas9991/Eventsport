@@ -1,69 +1,70 @@
 <?php
-// events.php - Liste des événements à venir
-
 session_start();
-include 'includes/db.php';
+include 'includes/db.php'; // Chemin vers votre fichier de connexion à la base de données
 
-// Récupérer tous les événements à venir
-$stmt = $pdo->query("SELECT e.*, u.username AS creator_name FROM event e JOIN user u ON e.creator_id = u.id ORDER BY e.date ASC");
-$events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Vérifie si un ID d'événement est passé dans l'URL
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $event_id = $_GET['id'];
+
+    // Prépare et exécute la requête pour récupérer l'événement spécifique
+    $stmt = $pdo->prepare("SELECT e.*, u.username AS creator_name 
+                           FROM event e 
+                           JOIN user u ON e.creator_id = u.id 
+                           WHERE e.id = ?");
+    $stmt->execute([$event_id]);
+    $event = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Si l'événement n'existe pas, redirige vers la page des événements
+    if (!$event) {
+        header('Location: events.php');
+        exit;
+    }
+} else {
+    // Si aucun ID n'est fourni, redirige vers la page des événements
+    header('Location: events.php');
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Événements à venir - EventSport</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($event['title']) ?> - EventSport</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="public-page">
+    <?php include 'includes/navbar.php'; // Inclusion de la navbar publique ?>
 
-<!-- En-tête -->
-<header>
-    <div class="container">
-        <h1>EventSport</h1>
-        <nav>
-            <?php if (isset($_SESSION['user'])): ?>
-                <a href="admin/index.php">Espace Admin</a>
-                <a href="logout.php">Se déconnecter</a>
-            <?php else: ?>
-                <a href="login.php">Se connecter</a>
-                <a href="register.php">S'inscrire</a>
-            <?php endif; ?>
-        </nav>
-    </div>
-</header>
+    <div class="main-content-public">
+        <div class="main-content">
+            <section class="event-detail-page">
+                <div class="event-detail-card">
+                    <?php if ($event['image']): ?>
+                        <img src="uploads/<?= htmlspecialchars($event['image']) ?>" alt="<?= htmlspecialchars($event['title']) ?>" class="event-detail-image">
+                    <?php else: ?>
+                        <img src="https://via.placeholder.com/800x400?text=Pas+d'image+pour+l'événement" alt="Image par défaut" class="event-detail-image">
+                    <?php endif; ?>
 
-<!-- Contenu principal -->
-<main class="container">
-    <h2>Événements à venir</h2>
+                    <h1><?= htmlspecialchars($event['title']) ?></h1>
+                    <p class="event-meta">
+                        <strong>Date :</strong> <?= htmlspecialchars(date('d/m/Y H:i', strtotime($event['date']))) ?><br>
+                        <strong>Lieu :</strong> <?= htmlspecialchars($event['location']) ?><br>
+                        <strong>Créé par :</strong> <?= htmlspecialchars($event['creator_name']) ?>
+                    </p>
+                    <div class="event-description">
+                        <h3>Description de l'événement :</h3>
+                        <p><?= nl2br(htmlspecialchars($event['description'])) ?></p>
+                    </div>
 
-    <?php if (!empty($events)): ?>
-        <div class="event-list">
-            <?php foreach ($events as $event): ?>
-                <div class="event-card">
-                    <h3><?= htmlspecialchars($event['title']) ?></h3>
-                    <p><strong>Date :</strong> <?= htmlspecialchars($event['date']) ?></p>
-                    <p><strong>Lieu :</strong> <?= htmlspecialchars($event['location']) ?></p>
-                    <p><strong>Description :</strong> <?= nl2br(htmlspecialchars($event['description'])) ?></p>
-                    <p><strong>Créé par :</strong> <?= htmlspecialchars($event['creator_name']) ?></p>
-                    <a href="event.php?id=<?= $event['id'] ?>" class="btn">Voir les détails</a>
+                    <a href="events.php" class="btn">← Retour aux événements</a>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <p>Aucun événement prévu pour le moment.</p>
-    <?php endif; ?>
-
-    <p><a href="index.php" class="btn-back">← Retour à l'accueil</a></p>
-</main>
-
-<!-- Pied de page -->
-<footer>
-    <div class="container">
-        <p>&copy; 2025 EventSport. Tous droits réservés.</p>
-    </div>
-</footer>
-
-</body>
+            </section>
+        </div><footer>
+            <div class="container">
+                <p>&copy; <?= date('Y') ?> EventSport. Tous droits réservés.</p>
+            </div>
+        </footer>
+    </div></body>
 </html>

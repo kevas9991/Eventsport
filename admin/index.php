@@ -1,66 +1,57 @@
 <?php
-// Activer l'affichage des erreurs (facile à commenter plus tard)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+session_start(); // Démarre une session PHP
 
-// Démarrer la session
-session_start();
-
-// Vérifier si l'utilisateur est connecté ET est administrateur
+// Vérifie si l'utilisateur est connecté et a le rôle 'admin', sinon redirige vers la page de connexion
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header('Location: ../login.php');
-    exit;
+    header('Location: ../login.php'); // Redirige vers la page de connexion, qui est à la racine
+    exit; // Arrête l'exécution du script
 }
 
-// Inclure la connexion à la base de données
-include '../includes/db.php';
+include '../includes/db.php'; // Inclut le fichier de connexion à la base de données
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de bord Admin - EventSport</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Bienvenue, <?= htmlspecialchars($_SESSION['user']['username']) ?> 👋</h1>
-        <p>Vous êtes connecté en tant qu'administrateur.</p>
+    <link rel="stylesheet" href="../css/style.css"> </head>
+<body class="admin-page"> <?php include 'includes/navbar_admin.php'; ?> <div class="main-content-wrapper">
+        <main class="main-content">
+            <section class="admin-content-section event-showcase">
+                <h1>Tableau de bord Administrateur</h1>
+                <p>Bienvenue, <span style="color: #e74c3c; font-weight: bold;"><?= htmlspecialchars($_SESSION['user']['username']) ?></span> !</p>
+                <p>Ceci est votre panneau d'administration où vous pouvez gérer les utilisateurs et les événements.</p>
 
-        <div class="dashboard">
-            <div class="card">
-                <h3>Utilisateurs</h3>
-                <?php
-                // Compter les utilisateurs
-                $stmt = $pdo->query("SELECT COUNT(*) AS total_users FROM user");
-                $data = $stmt->fetch(PDO::FETCH_ASSOC);
-                echo "<p>Total : " . $data['total_users'] . "</p>";
-                ?>
-                <a href="users.php" class="btn">Gérer les utilisateurs</a>
+                <div class="event-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <div class="event-card" style="text-align: center;">
+                        <h3 style="color: #2c3e50;">Gérer les utilisateurs</h3>
+                        <p>Ajoutez, modifiez ou supprimez des comptes utilisateurs.</p>
+                        <a href="users.php" class="btn">Accéder aux utilisateurs</a>
+                    </div>
+
+                    <div class="event-card" style="text-align: center;">
+                        <h3 style="color: #2c3e50;">Gérer les événements</h3>
+                        <p>Créez, modifiez ou supprimez des événements.</p>
+                        <a href="events.php" class="btn">Accéder aux événements</a>
+                    </div>
+
+                    <div class="event-card" style="text-align: center;">
+                        <h3 style="color: #2c3e50;">Créer un événement</h3>
+                        <p>Ajoutez un nouvel événement à la plateforme.</p>
+                        <a href="create-event.php" class="btn">Créer un événement</a>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>&copy; <?= date('Y') ?> EventSport Admin. Tous droits réservés.</p>
             </div>
-
-            <div class="card">
-                <h3>Événements</h3>
-                <?php
-                // Compter les événements
-                try {
-                    $stmt = $pdo->query("SELECT COUNT(*) AS total_events FROM event");
-                    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-                    echo "<p>Total : " . $data['total_events'] . "</p>";
-                } catch (PDOException $e) {
-                    echo "<p style='color:red;'>Erreur événements : Table absente ?</p>";
-                }
-                ?>
-                <a href="events.php" class="btn">Gérer les événements</a>
-            </div>
-        </div>
-
-        <!-- Bouton de déconnexion centré -->
-        <div class="logout-section">
-            <a href="logout.php" class="btn-red">Se déconnecter</a>
-        </div>
+        </footer>
     </div>
 </body>
 </html>

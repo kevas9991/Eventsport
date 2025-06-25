@@ -1,10 +1,8 @@
 <?php
-session_start();
+session_start(); // Démarre la session pour accéder aux données de session
 
-// Détruire toutes les données de la session
-session_destroy();
+session_destroy(); // Détruit toutes les données associées à la session en cours (déconnexion)
 
-// Rediriger vers la page de connexion
-header('Location: login.php');
-exit;
+header('Location: login.php'); // Redirige l'utilisateur vers la page de connexion
+exit; // Termine le script après la redirection
 ?>
